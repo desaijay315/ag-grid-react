@@ -5,61 +5,71 @@ import 'ag-grid-community/dist/styles/ag-theme-balham.css';
 
 const  columnDefs=  [
   {
-    headerName: "ID",
-    width: 50,
-    valueGetter: "node.id",
-    cellRenderer: "loadingRenderer"
+    headerName: "Personal Information",
+   groupId: "PersonalGroup",
+   children: [
+      {
+      headerName: "ID",
+      valueGetter: "node.id",
+      cellRenderer: "loadingRenderer",
+      lockPosition: true 
+      },
+      {
+      headerName: "Athlete",
+      field: "athlete"
+      },
+      {
+      headerName: "Age",
+      field: "age",
+      colId: "age",
+      columnGroupShow: "open"
+      },
+      {
+        headerName: "Country",
+        field: "country",
+        headerTooltip: "Player Country",
+        columnGroupShow: "open"
+      },
+    ]
   },
   {
-    headerName: "Athlete",
-    field: "athlete",
-    width: 150
+    headerName: "Score Information",
+    groupId: "ScoreInfo",
+    marryChildren: true,
+    children: [
+      {
+        headerName: "Year",
+        field: "year"
+      },
+      {
+        headerName: "Date",
+        field: "date"
+      },
+      {
+        headerName: "Sport",
+        field: "sport"
+      },
+      {
+        headerName: "Gold",
+        field: "gold"
+      },
+      {
+        headerName: "Silver",
+        field: "silver",
+        columnGroupShow: "open"
+      },
+      {
+        headerName: "Bronze",
+        field: "bronze",
+        columnGroupShow: "open"
+      },
+      {
+        headerName: "Total",
+        field: "total",
+        columnGroupShow: "open"
+      }
+    ]
   },
-  {
-    headerName: "Age",
-    field: "age",
-    width: 90
-  },
-  {
-    headerName: "Country",
-    field: "country",
-    width: 120
-  },
-  {
-    headerName: "Year",
-    field: "year",
-    width: 90
-  },
-  {
-    headerName: "Date",
-    field: "date",
-    width: 110
-  },
-  {
-    headerName: "Sport",
-    field: "sport",
-    width: 110
-  },
-  {
-    headerName: "Gold",
-    field: "gold",
-    width: 100
-  },
-  {
-    headerName: "Silver",
-    field: "silver",
-    width: 100
-  },
-  {
-    headerName: "Bronze",
-    field: "bronze",
-    width: 100
-  },
-  {
-    headerName: "Total",
-    field: "total",
-    width: 100
-  }
 ];
 const defaultColDef = {
   resizable: true,
@@ -78,6 +88,7 @@ const components = {
 }
 
 
+
 function App() {
   console.log("AgGridWithUseState Render");
  
@@ -86,9 +97,24 @@ function App() {
   const [rowData, setRowData] = useState(null);
   const [modelVisibility, setModelVisibility] = useState(true);
 
+
+  const toggleExpansion = expand => {
+    let groupNames = ["PersonalGroup", "ScoreInfo"];
+    groupNames.forEach(groupId => {
+      columnApi.setColumnGroupOpened(groupId, expand);
+    });
+  };
+
   const onGridReady = params => {
     setGridApi(params.api)
     setColumnApi(params.columnApi);
+
+    let columnIds = [];
+    console.log(params.columnApi)
+    params.columnApi.getAllColumns().forEach(column => {
+      columnIds.push(column.colId);
+    });
+    params.columnApi.autoSizeColumns(columnIds);
 
     // const updateData = (data) => {
     //   setRowData(data);
@@ -155,6 +181,12 @@ function App() {
         <button type="button" onClick={onButtonClick}>
           Selected Rows
       </button>
+      <button type="button" onClick={() => toggleExpansion(true)}>
+          Expand All
+      </button>
+      <button type="button" onClick={() => toggleExpansion(false)}>
+          Collapse All
+      </button>
          <AgGridReact
           rowSelection={'multiple'}
           onGridReady={onGridReady}
@@ -169,6 +201,7 @@ function App() {
           maxConcurrentDatasourceRequests={1}
           infiniteInitialRowCount={1000}
           maxBlocksInCache={10}
+          colResizeDefault={'shift'}
         >
         </AgGridReact>
     </div>
