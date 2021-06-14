@@ -4,21 +4,62 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-balham.css';
 
 const  columnDefs=  [
-  { headerName: "Name", field: "name" },
-  { headerName: "Street", field: "address.street1" },
-  { headerName: "City", field: "address.city" },
-  { headerName: "State", field: "address.state" },
   {
-    headerName: "Address",
-    valueGetter: ({ data }) =>
-       `${data.address.street1} ${data.address.city}, ${data.address.state} ${data.address.zip}`
+    headerName: "ID",
+    width: 50,
+    valueGetter: "node.id",
+    cellRenderer: "loadingRenderer"
   },
   {
-    headerName: "Avatar",
-    field: "avatar",
-    width: 100,
-    cellRenderer: ({ value }) => `<img style="height: 14px; width: 14px" src=${value} />`
-   },
+    headerName: "Athlete",
+    field: "athlete",
+    width: 150
+  },
+  {
+    headerName: "Age",
+    field: "age",
+    width: 90
+  },
+  {
+    headerName: "Country",
+    field: "country",
+    width: 120
+  },
+  {
+    headerName: "Year",
+    field: "year",
+    width: 90
+  },
+  {
+    headerName: "Date",
+    field: "date",
+    width: 110
+  },
+  {
+    headerName: "Sport",
+    field: "sport",
+    width: 110
+  },
+  {
+    headerName: "Gold",
+    field: "gold",
+    width: 100
+  },
+  {
+    headerName: "Silver",
+    field: "silver",
+    width: 100
+  },
+  {
+    headerName: "Bronze",
+    field: "bronze",
+    width: 100
+  },
+  {
+    headerName: "Total",
+    field: "total",
+    width: 100
+  }
 ];
 const defaultColDef = {
   resizable: true,
@@ -26,13 +67,18 @@ const defaultColDef = {
   filter: true
 }
 
-
+const components = {
+  loadingRenderer: function(params) {
+    if (params.value !== undefined) {
+      return params.value;
+    } else {
+      return '<img src="./loading.gif">';
+    }
+  }
+}
 
 
 function App() {
-
-  
-
   console.log("AgGridWithUseState Render");
  
   const [gridApi, setGridApi] = useState(null);
@@ -44,11 +90,29 @@ function App() {
     setGridApi(params.api)
     setColumnApi(params.columnApi);
 
+    // const updateData = (data) => {
+    //   setRowData(data);
+    // };
+
     const updateData = (data) => {
-      setRowData(data);
+      var dataSource = {
+        rowCount: null,
+        getRows: function (params) {
+          console.log('data row from ' + params.startRow + ' to ' + params.endRow);
+          setTimeout(function () {
+            var rowsThisPage = data.slice(params.startRow, params.endRow);
+            var lastRow = -1;
+            if (data.length <= params.endRow) {
+              lastRow = data.length;
+            }
+            params.successCallback(rowsThisPage, lastRow);
+          }, 500);
+        },
+      };
+      params.api.setDatasource(dataSource);
     };
 
-    fetch('http://localhost:3001/api/customers')
+    fetch('https://raw.githubusercontent.com/ag-grid/ag-grid/master/packages/ag-grid-docs/src/olympicWinners.json')
     .then(res => res.json()).then(rowData => updateData(rowData))
     params.api.sizeColumnsToFit();
   }
@@ -97,6 +161,14 @@ function App() {
           columnDefs={columnDefs}
           rowData={rowData}
           defaultColDef={defaultColDef}
+          components={components}
+          rowBuffer={0}
+          rowModelType={'infinite'}
+          paginationPageSize={100}
+          cacheOverflowSize={2}
+          maxConcurrentDatasourceRequests={1}
+          infiniteInitialRowCount={1000}
+          maxBlocksInCache={10}
         >
         </AgGridReact>
     </div>
