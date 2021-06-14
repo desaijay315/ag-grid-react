@@ -16,7 +16,9 @@ const  columnDefs=  [
       },
       {
       headerName: "Athlete",
-      field: "athlete"
+      field: "athlete",
+      colId: "athlete",
+      lockPinned: true
       },
       {
       headerName: "Age",
@@ -187,6 +189,19 @@ function App() {
       <button type="button" onClick={() => toggleExpansion(false)}>
           Collapse All
       </button>
+      <button
+        type="button"
+        onClick={() => columnApi.setColumnPinned("athlete", "left")}
+      >
+        Pin Athlete Name to Left
+      </button>
+
+      <button
+        type="button"
+        onClick={() => columnApi.setColumnPinned("athlete", null)}
+        >
+        Unpin Athlete Name
+        </button>
          <AgGridReact
           rowSelection={'multiple'}
           onGridReady={onGridReady}
