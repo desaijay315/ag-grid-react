@@ -4,28 +4,34 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-balham.css';
 
 const  columnDefs=  [
+  { headerName: "Name", field: "name" },
+  { headerName: "Street", field: "address.street1" },
+  { headerName: "City", field: "address.city" },
+  { headerName: "State", field: "address.state" },
   {
-    headerName: 'Athlete',
-    field: 'athlete',
-    sortable: true,
-    filter: true,
-    checkboxSelection: true
+    headerName: "Address",
+    valueGetter: ({ data }) =>
+       `${data.address.street1} ${data.address.city}, ${data.address.state} ${data.address.zip}`
   },
   {
-    headerName: 'Age',
-    field: 'age',
-    sortable: true,
-    filter: true
-  },
-  {
-    headerName: 'Country',
-    field: 'country',
-    sortable: true,
-    filter: true
-  }
+    headerName: "Avatar",
+    field: "avatar",
+    width: 100,
+    cellRenderer: ({ value }) => `<img style="height: 14px; width: 14px" src=${value} />`
+   },
 ];
+const defaultColDef = {
+  resizable: true,
+  sortable: true,
+  filter: true
+}
+
+
+
 
 function App() {
+
+  
 
   console.log("AgGridWithUseState Render");
  
@@ -42,7 +48,7 @@ function App() {
       setRowData(data);
     };
 
-    fetch('https://raw.githubusercontent.com/ag-grid/ag-grid-docs/master/src/olympicWinnersSmall.json')
+    fetch('http://localhost:3001/api/customers')
     .then(res => res.json()).then(rowData => updateData(rowData))
     params.api.sizeColumnsToFit();
   }
@@ -75,8 +81,7 @@ function App() {
     <div
         className="ag-theme-balham"
         style={{
-          height: '500px',
-          width: '600px'
+          height: '800px'
         }}
       >
 
@@ -91,7 +96,9 @@ function App() {
           onGridReady={onGridReady}
           columnDefs={columnDefs}
           rowData={rowData}
-        ></AgGridReact>
+          defaultColDef={defaultColDef}
+        >
+        </AgGridReact>
     </div>
   );
 }
