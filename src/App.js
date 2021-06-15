@@ -2,6 +2,7 @@ import {useState} from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-balham.css';
+import 'ag-grid-enterprise'
 
 
 //agTextColumnFilter is a filter options provided by the ag-grid
@@ -34,7 +35,8 @@ const  columnDefs=  [
   },
   {
     headerName: "Acct Name",
-    field: "accountName"
+    field: "accountName",
+    filter: "agSetColumnFilter"
   },
   {
     headerName: "Date Opened",
@@ -120,8 +122,14 @@ function App() {
     gridApi.setQuickFilter(event.target.value);
   }
 
-  const checkingAndSavings = () =>{
-
+  const checkingAndSavings = () => {
+    const accountNameFilter = gridApi.getFilterInstance("accountName");
+    accountNameFilter.selectNothing();
+    accountNameFilter.selectValue("Checking Account");
+    accountNameFilter.selectValue("Savings Account");
+    accountNameFilter.applyModel();
+    gridApi.setSortModel([{ colId: "lastName", sort: "asc" }]);
+    gridApi.onFilterChanged();
   }
 
   const clearFilters = () => {
